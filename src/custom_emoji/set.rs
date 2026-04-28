@@ -9,15 +9,26 @@
  * except according to those terms.
  */
 
-use crate::{core::set::SetObject, Get, Set};
+use crate::{chat_validation::ValidationError, core::set::SetObject, Get, Set};
 
 use super::CustomEmoji;
 
-pub fn validate_name(name: &str) -> bool {
-    !name.is_empty()
-        && name
+/// Validate a custom emoji name.
+///
+/// Names must be non-empty and contain only ASCII lowercase letters, digits, `-`, or `_`.
+pub fn validate_name(name: &str) -> Result<(), ValidationError> {
+    if name.is_empty()
+        || !name
             .chars()
             .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '_')
+    {
+        Err(ValidationError::InvalidEmoji(format!(
+            "emoji name {:?} must be non-empty and contain only [a-z0-9_-]",
+            name
+        )))
+    } else {
+        Ok(())
+    }
 }
 
 impl CustomEmoji<Set> {

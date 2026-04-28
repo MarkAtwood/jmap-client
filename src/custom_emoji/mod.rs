@@ -140,21 +140,21 @@ mod tests {
 
     #[test]
     fn test_validate_name_ok() {
-        assert!(set::validate_name("cat-jam_2"));
+        assert!(set::validate_name("cat-jam_2").is_ok());
     }
 
     #[test]
     fn test_validate_name_reject_uppercase() {
-        assert!(!set::validate_name("Cat"));
+        assert!(set::validate_name("Cat").is_err());
     }
 
     #[test]
     fn test_validate_name_reject_space() {
-        assert!(!set::validate_name("cat jam"));
+        assert!(set::validate_name("cat jam").is_err());
     }
 
     #[test]
     fn test_validate_name_empty() {
-        assert!(!set::validate_name(""));
+        assert!(set::validate_name("").is_err());
     }
 }

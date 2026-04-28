@@ -27,6 +27,26 @@ use super::{CustomEmoji, Property};
 
 impl Client {
     #[maybe_async::maybe_async]
+    pub async fn custom_emoji_create(&self, emoji: CustomEmoji<Set>) -> crate::Result<CustomEmoji> {
+        let mut request = self.build();
+        let id = request.set_custom_emoji().create_item(emoji);
+        request
+            .send_single::<CustomEmojiSetResponse>()
+            .await?
+            .created(&id)
+    }
+
+    #[maybe_async::maybe_async]
+    pub async fn custom_emoji_destroy(&self, id: &str) -> crate::Result<()> {
+        let mut request = self.build();
+        request.set_custom_emoji().destroy([id]);
+        request
+            .send_single::<CustomEmojiSetResponse>()
+            .await?
+            .destroyed(id)
+    }
+
+    #[maybe_async::maybe_async]
     pub async fn custom_emoji_get(
         &self,
         id: &str,
