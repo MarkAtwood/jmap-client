@@ -176,6 +176,25 @@ pub fn validate_sha256_hex(s: &str) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// Validate a custom emoji name.
+///
+/// Names must be non-empty and contain only ASCII lowercase letters, digits, `-`, or `_`,
+/// per spec §Custom Emoji.
+pub fn validate_emoji_name(name: &str) -> Result<(), ValidationError> {
+    if name.is_empty()
+        || !name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '_')
+    {
+        Err(ValidationError::InvalidEmoji(format!(
+            "emoji name {:?} must be non-empty and contain only [a-z0-9_-]",
+            name
+        )))
+    } else {
+        Ok(())
+    }
+}
+
 /// Validate that a body fits within the server-advertised maximum byte length.
 pub fn validate_body_bytes(body: &str, max_bytes: usize) -> Result<(), ValidationError> {
     if body.len() > max_bytes {
@@ -294,6 +313,24 @@ mod tests {
     #[test]
     fn test_sha256_wrong_length() {
         assert!(validate_sha256_hex("aabbcc").is_err());
+    }
+
+    // --- validate_emoji_name ---
+    #[test]
+    fn test_emoji_name_ok() {
+        assert!(validate_emoji_name("cat-jam_2").is_ok());
+    }
+    #[test]
+    fn test_emoji_name_empty() {
+        assert!(validate_emoji_name("").is_err());
+    }
+    #[test]
+    fn test_emoji_name_uppercase() {
+        assert!(validate_emoji_name("Cat").is_err());
+    }
+    #[test]
+    fn test_emoji_name_space() {
+        assert!(validate_emoji_name("cat jam").is_err());
     }
 
     // --- validate_body_bytes ---

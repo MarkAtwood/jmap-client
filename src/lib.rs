@@ -551,6 +551,7 @@ pub enum Error {
     Server(String),
     Method(MethodError),
     Set(SetError<String>),
+    Validation(crate::chat_validation::ValidationError),
     #[cfg(feature = "websockets")]
     WebSocket(tokio_tungstenite::tungstenite::error::Error),
 }
@@ -593,6 +594,12 @@ impl From<&str> for Error {
     }
 }
 
+impl From<crate::chat_validation::ValidationError> for Error {
+    fn from(e: crate::chat_validation::ValidationError) -> Self {
+        Error::Validation(e)
+    }
+}
+
 #[cfg(feature = "websockets")]
 impl From<tokio_tungstenite::tungstenite::error::Error> for Error {
     fn from(e: tokio_tungstenite::tungstenite::error::Error) -> Self {
@@ -610,6 +617,7 @@ impl Display for Error {
             Error::Server(e) => write!(f, "Server failed: {}", e),
             Error::Method(e) => write!(f, "Request failed: {}", e),
             Error::Set(e) => write!(f, "Set failed: {}", e),
+            Error::Validation(e) => write!(f, "Validation error: {}", e),
             #[cfg(feature = "websockets")]
             Error::WebSocket(e) => write!(f, "WebSockets error: {}", e),
         }

@@ -58,8 +58,8 @@ impl ChatContact<Get> {
         self.endpoints.as_deref()
     }
 
-    pub fn blocked(&self) -> bool {
-        self.blocked.unwrap_or(false)
+    pub fn blocked(&self) -> Option<bool> {
+        self.blocked
     }
 }
 

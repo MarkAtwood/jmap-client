@@ -25,8 +25,8 @@ impl SpaceInvite<Get> {
     pub fn max_uses(&self) -> Option<u64> {
         self.max_uses
     }
-    pub fn uses(&self) -> u64 {
-        self.uses.unwrap_or(0)
+    pub fn uses(&self) -> Option<u64> {
+        self.uses
     }
     pub fn created_at(&self) -> Option<&str> {
         self.created_at.as_deref()

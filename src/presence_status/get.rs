@@ -19,8 +19,8 @@ impl PresenceStatus<Get> {
     pub fn expires_at(&self) -> Option<&str> {
         self.expires_at.as_deref()
     }
-    pub fn receipt_sharing(&self) -> bool {
-        self.receipt_sharing.unwrap_or(true)
+    pub fn receipt_sharing(&self) -> Option<bool> {
+        self.receipt_sharing
     }
     pub fn updated_at(&self) -> Option<&str> {
         self.updated_at.as_deref()
