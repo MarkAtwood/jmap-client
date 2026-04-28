@@ -50,20 +50,93 @@ bd close <id>         # Complete work
 <!-- END BEADS INTEGRATION -->
 
 
+## What This Is
+
+A Rust library providing a full client-side implementation of the JMAP protocol suite:
+- JMAP Core (RFC 8620) — session, request/response, error handling, set operations
+- JMAP for Mail (RFC 8621) — email, mailbox, thread, submission, identity, vacation response
+- JMAP over WebSocket (RFC 8887) — async WebSocket streams
+- JMAP for Sieve Scripts (draft-ietf-jmap-sieve) — Sieve script management
+
+Upstream repo: https://github.com/stalwartlabs/jmap-client (this is a fork/working copy)
+
 ## Build & Test
 
-_Add your build and test commands here_
-
 ```bash
-# Example:
-# npm install
-# npm test
+# Build (default: async + websockets + aws_lc_rs)
+cargo build
+
+# Test all features
+cargo test --all-features
+
+# Test blocking mode (mutually exclusive with async)
+cargo test --no-default-features --features blocking,ring
+
+# Lint
+cargo clippy --all-features -- -D warnings
+
+# Format check
+cargo fmt --check
+
+# Docs
+RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features
 ```
 
-## Architecture Overview
+## Feature Flags
 
-_Add a brief overview of your project architecture_
+| Feature | Default | Description |
+|---------|---------|-------------|
+| `async` | yes | Async HTTP + EventSource via `reqwest`/`futures` |
+| `websockets` | yes | JMAP over WebSocket via `tokio-tungstenite` + `rustls` |
+| `aws_lc_rs` | yes | rustls crypto backend (AWS-LC) |
+| `ring` | no | rustls crypto backend (ring); mutually exclusive with `aws_lc_rs` |
+| `blocking` | no | Blocking HTTP via `reqwest`; mutually exclusive with `async` |
+| `debug` | no | Enable debug output |
 
-## Conventions & Patterns
+`blocking` and `async` are mutually exclusive — `maybe-async` selects at compile time.
 
-_Add your project-specific conventions here_
+## Architecture
+
+```
+src/
+├── lib.rs              URI, Method, DataType enums; Error type; crate root
+├── client.rs           Client struct, builder, request dispatch (async path)
+├── client_ws.rs        WebSocket client (websockets feature)
+├── core/               JMAP Core — session, get/set/query/changes/request/response/errors
+├── blob/               Blob copy
+├── email/              Email — get, set, query, changes, import, parse, search_snippet
+├── email_submission/   EmailSubmission methods
+├── event_source/       EventSource async stream (async feature)
+├── identity/           Identity methods
+├── mailbox/            Mailbox methods
+├── principal/          Principal methods
+├── push_subscription/  PushSubscription methods
+├── sieve/              Sieve script methods
+├── thread/             Thread methods
+└── vacation_response/  VacationResponse methods
+```
+
+Each object module follows the JMAP verb layout: `get.rs`, `set.rs`, `query.rs`,
+`changes.rs`, with a `mod.rs` re-exporting types.
+
+## Conventions
+
+- `#[forbid(unsafe_code)]` at crate root — no unsafe anywhere
+- Use `maybe-async` macros (`#[maybe_async]`, `#[async_impl]`, `#[sync_impl]`)
+  for async/blocking duality — do not use `#[cfg(feature = "async")]` for branching
+- Wire format is camelCase JSON; Rust identifiers are snake_case — use `#[serde(rename)]`
+- Use `AHashMap` (from `ahash`) instead of `std::collections::HashMap`
+- `parking_lot::RwLock` for shared mutable state in `Client`
+- `From` impls on `Error` for all transport/parse/method error types
+- No `.unwrap()` or `.expect()` in library code — propagate errors
+
+## Branch Naming
+
+- `feat/<short-description>` — new features
+- `fix/<short-description>` — bug fixes
+
+## Related Specs
+
+`~/PROJECT/jmap-chat-spec/` contains draft JMAP extension specs (JMAP Chat, federation,
+FileNode, push, WSS, CID) that are candidates for future client support. Consult these
+before implementing any new JMAP extension methods.

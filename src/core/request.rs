@@ -11,7 +11,11 @@
 
 use crate::{
     blob::copy::CopyBlobRequest,
+    chat::{Chat, TypingRequest},
+    chat_contact::ChatContact,
+    chat_message::Message as ChatMessage,
     client::Client,
+    custom_emoji::CustomEmoji,
     email::{
         import::EmailImportRequest, parse::EmailParseRequest,
         search_snippet::SearchSnippetGetRequest, Email,
@@ -19,9 +23,14 @@ use crate::{
     email_submission::EmailSubmission,
     identity::Identity,
     mailbox::Mailbox,
+    presence_status::PresenceStatus,
     principal::Principal,
     push_subscription::PushSubscription,
+    read_position::ReadPosition,
     sieve::{validate::SieveScriptValidateRequest, SieveScript},
+    space::{Space, SpaceJoinRequest},
+    space_ban::SpaceBan,
+    space_invite::SpaceInvite,
     thread::Thread,
     vacation_response::VacationResponse,
     Error, Method, Set, URI,
@@ -101,6 +110,37 @@ pub enum Arguments {
     PrincipalQuery(QueryRequest<Principal<Set>>),
     PrincipalQueryChanges(QueryChangesRequest<Principal<Set>>),
     PrincipalSet(SetRequest<Principal<Set>>),
+    // Chat
+    ChatContactGet(GetRequest<ChatContact<Set>>),
+    ChatContactSet(SetRequest<ChatContact<Set>>),
+    ChatContactQuery(QueryRequest<ChatContact<Set>>),
+    ChatContactQueryChanges(QueryChangesRequest<ChatContact<Set>>),
+    ChatGet(GetRequest<Chat<Set>>),
+    ChatSet(SetRequest<Chat<Set>>),
+    ChatQuery(QueryRequest<Chat<Set>>),
+    ChatQueryChanges(QueryChangesRequest<Chat<Set>>),
+    TypingChat(TypingRequest),
+    ChatMessageGet(GetRequest<ChatMessage<Set>>),
+    ChatMessageSet(SetRequest<ChatMessage<Set>>),
+    ChatMessageQuery(QueryRequest<ChatMessage<Set>>),
+    ChatMessageQueryChanges(QueryChangesRequest<ChatMessage<Set>>),
+    SpaceGet(GetRequest<Space<Set>>),
+    SpaceSet(SetRequest<Space<Set>>),
+    SpaceQuery(QueryRequest<Space<Set>>),
+    SpaceQueryChanges(QueryChangesRequest<Space<Set>>),
+    SpaceJoin(SpaceJoinRequest),
+    ReadPositionGet(GetRequest<ReadPosition<Set>>),
+    ReadPositionSet(SetRequest<ReadPosition<Set>>),
+    PresenceStatusGet(GetRequest<PresenceStatus<Set>>),
+    PresenceStatusSet(SetRequest<PresenceStatus<Set>>),
+    CustomEmojiGet(GetRequest<CustomEmoji<Set>>),
+    CustomEmojiSet(SetRequest<CustomEmoji<Set>>),
+    CustomEmojiQuery(QueryRequest<CustomEmoji<Set>>),
+    CustomEmojiQueryChanges(QueryChangesRequest<CustomEmoji<Set>>),
+    SpaceInviteGet(GetRequest<SpaceInvite<Set>>),
+    SpaceInviteSet(SetRequest<SpaceInvite<Set>>),
+    SpaceBanGet(GetRequest<SpaceBan<Set>>),
+    SpaceBanSet(SetRequest<SpaceBan<Set>>),
 }
 
 impl Arguments {
@@ -468,6 +508,326 @@ impl Arguments {
     pub fn principal_set_mut(&mut self) -> &mut SetRequest<Principal<Set>> {
         match self {
             Arguments::PrincipalSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_contact_get(params: RequestParams) -> Self {
+        Arguments::ChatContactGet(GetRequest::new(params))
+    }
+
+    pub fn chat_contact_set(params: RequestParams) -> Self {
+        Arguments::ChatContactSet(SetRequest::new(params))
+    }
+
+    pub fn chat_contact_query(params: RequestParams) -> Self {
+        Arguments::ChatContactQuery(QueryRequest::new(params))
+    }
+
+    pub fn chat_contact_query_changes(params: RequestParams, since_query_state: String) -> Self {
+        Arguments::ChatContactQueryChanges(QueryChangesRequest::new(params, since_query_state))
+    }
+
+    pub fn chat_get(params: RequestParams) -> Self {
+        Arguments::ChatGet(GetRequest::new(params))
+    }
+
+    pub fn chat_set(params: RequestParams) -> Self {
+        Arguments::ChatSet(SetRequest::new(params))
+    }
+
+    pub fn chat_query(params: RequestParams) -> Self {
+        Arguments::ChatQuery(QueryRequest::new(params))
+    }
+
+    pub fn chat_query_changes(params: RequestParams, since_query_state: String) -> Self {
+        Arguments::ChatQueryChanges(QueryChangesRequest::new(params, since_query_state))
+    }
+
+    pub fn typing_chat(params: RequestParams, chat_id: String, typing: bool) -> Self {
+        Arguments::TypingChat(TypingRequest {
+            account_id: params.account_id.clone(),
+            chat_id,
+            typing,
+        })
+    }
+
+    pub fn chat_message_get(params: RequestParams) -> Self {
+        Arguments::ChatMessageGet(GetRequest::new(params))
+    }
+
+    pub fn chat_message_set(params: RequestParams) -> Self {
+        Arguments::ChatMessageSet(SetRequest::new(params))
+    }
+
+    pub fn chat_message_query(params: RequestParams) -> Self {
+        Arguments::ChatMessageQuery(QueryRequest::new(params))
+    }
+
+    pub fn chat_message_query_changes(params: RequestParams, since_query_state: String) -> Self {
+        Arguments::ChatMessageQueryChanges(QueryChangesRequest::new(params, since_query_state))
+    }
+
+    pub fn space_get(params: RequestParams) -> Self {
+        Arguments::SpaceGet(GetRequest::new(params))
+    }
+
+    pub fn space_set(params: RequestParams) -> Self {
+        Arguments::SpaceSet(SetRequest::new(params))
+    }
+
+    pub fn space_query(params: RequestParams) -> Self {
+        Arguments::SpaceQuery(QueryRequest::new(params))
+    }
+
+    pub fn space_query_changes(params: RequestParams, since_query_state: String) -> Self {
+        Arguments::SpaceQueryChanges(QueryChangesRequest::new(params, since_query_state))
+    }
+
+    pub fn space_join(request: SpaceJoinRequest) -> Self {
+        Arguments::SpaceJoin(request)
+    }
+
+    pub fn read_position_get(params: RequestParams) -> Self {
+        Arguments::ReadPositionGet(GetRequest::new(params))
+    }
+
+    pub fn read_position_set(params: RequestParams) -> Self {
+        Arguments::ReadPositionSet(SetRequest::new(params))
+    }
+
+    pub fn presence_status_get(params: RequestParams) -> Self {
+        Arguments::PresenceStatusGet(GetRequest::new(params))
+    }
+
+    pub fn presence_status_set(params: RequestParams) -> Self {
+        Arguments::PresenceStatusSet(SetRequest::new(params))
+    }
+
+    pub fn custom_emoji_get(params: RequestParams) -> Self {
+        Arguments::CustomEmojiGet(GetRequest::new(params))
+    }
+
+    pub fn custom_emoji_set(params: RequestParams) -> Self {
+        Arguments::CustomEmojiSet(SetRequest::new(params))
+    }
+
+    pub fn custom_emoji_query(params: RequestParams) -> Self {
+        Arguments::CustomEmojiQuery(QueryRequest::new(params))
+    }
+
+    pub fn custom_emoji_query_changes(params: RequestParams, since_query_state: String) -> Self {
+        Arguments::CustomEmojiQueryChanges(QueryChangesRequest::new(params, since_query_state))
+    }
+
+    pub fn space_invite_get(params: RequestParams) -> Self {
+        Arguments::SpaceInviteGet(GetRequest::new(params))
+    }
+
+    pub fn space_invite_set(params: RequestParams) -> Self {
+        Arguments::SpaceInviteSet(SetRequest::new(params))
+    }
+
+    pub fn space_ban_get(params: RequestParams) -> Self {
+        Arguments::SpaceBanGet(GetRequest::new(params))
+    }
+
+    pub fn space_ban_set(params: RequestParams) -> Self {
+        Arguments::SpaceBanSet(SetRequest::new(params))
+    }
+
+    pub fn chat_contact_get_mut(&mut self) -> &mut GetRequest<ChatContact<Set>> {
+        match self {
+            Arguments::ChatContactGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_contact_set_mut(&mut self) -> &mut SetRequest<ChatContact<Set>> {
+        match self {
+            Arguments::ChatContactSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_contact_query_mut(&mut self) -> &mut QueryRequest<ChatContact<Set>> {
+        match self {
+            Arguments::ChatContactQuery(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_contact_query_changes_mut(&mut self) -> &mut QueryChangesRequest<ChatContact<Set>> {
+        match self {
+            Arguments::ChatContactQueryChanges(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_get_mut(&mut self) -> &mut GetRequest<Chat<Set>> {
+        match self {
+            Arguments::ChatGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_set_mut(&mut self) -> &mut SetRequest<Chat<Set>> {
+        match self {
+            Arguments::ChatSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_query_mut(&mut self) -> &mut QueryRequest<Chat<Set>> {
+        match self {
+            Arguments::ChatQuery(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_query_changes_mut(&mut self) -> &mut QueryChangesRequest<Chat<Set>> {
+        match self {
+            Arguments::ChatQueryChanges(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_message_get_mut(&mut self) -> &mut GetRequest<ChatMessage<Set>> {
+        match self {
+            Arguments::ChatMessageGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_message_set_mut(&mut self) -> &mut SetRequest<ChatMessage<Set>> {
+        match self {
+            Arguments::ChatMessageSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_message_query_mut(&mut self) -> &mut QueryRequest<ChatMessage<Set>> {
+        match self {
+            Arguments::ChatMessageQuery(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn chat_message_query_changes_mut(&mut self) -> &mut QueryChangesRequest<ChatMessage<Set>> {
+        match self {
+            Arguments::ChatMessageQueryChanges(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_get_mut(&mut self) -> &mut GetRequest<Space<Set>> {
+        match self {
+            Arguments::SpaceGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_set_mut(&mut self) -> &mut SetRequest<Space<Set>> {
+        match self {
+            Arguments::SpaceSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_query_mut(&mut self) -> &mut QueryRequest<Space<Set>> {
+        match self {
+            Arguments::SpaceQuery(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_query_changes_mut(&mut self) -> &mut QueryChangesRequest<Space<Set>> {
+        match self {
+            Arguments::SpaceQueryChanges(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn read_position_get_mut(&mut self) -> &mut GetRequest<ReadPosition<Set>> {
+        match self {
+            Arguments::ReadPositionGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn read_position_set_mut(&mut self) -> &mut SetRequest<ReadPosition<Set>> {
+        match self {
+            Arguments::ReadPositionSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn presence_status_get_mut(&mut self) -> &mut GetRequest<PresenceStatus<Set>> {
+        match self {
+            Arguments::PresenceStatusGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn presence_status_set_mut(&mut self) -> &mut SetRequest<PresenceStatus<Set>> {
+        match self {
+            Arguments::PresenceStatusSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn custom_emoji_get_mut(&mut self) -> &mut GetRequest<CustomEmoji<Set>> {
+        match self {
+            Arguments::CustomEmojiGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn custom_emoji_set_mut(&mut self) -> &mut SetRequest<CustomEmoji<Set>> {
+        match self {
+            Arguments::CustomEmojiSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn custom_emoji_query_mut(&mut self) -> &mut QueryRequest<CustomEmoji<Set>> {
+        match self {
+            Arguments::CustomEmojiQuery(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn custom_emoji_query_changes_mut(&mut self) -> &mut QueryChangesRequest<CustomEmoji<Set>> {
+        match self {
+            Arguments::CustomEmojiQueryChanges(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_invite_get_mut(&mut self) -> &mut GetRequest<SpaceInvite<Set>> {
+        match self {
+            Arguments::SpaceInviteGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_invite_set_mut(&mut self) -> &mut SetRequest<SpaceInvite<Set>> {
+        match self {
+            Arguments::SpaceInviteSet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_ban_get_mut(&mut self) -> &mut GetRequest<SpaceBan<Set>> {
+        match self {
+            Arguments::SpaceBanGet(ref mut r) => r,
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn space_ban_set_mut(&mut self) -> &mut SetRequest<SpaceBan<Set>> {
+        match self {
+            Arguments::SpaceBanSet(ref mut r) => r,
             _ => unreachable!(),
         }
     }

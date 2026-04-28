@@ -1,0 +1,1 @@
+Wave E2E complete: cargo build clean, 72 unit tests pass (async), 71 (blocking). Chat implementation complete.

@@ -69,6 +69,7 @@ pub enum Capabilities {
     Submission(SubmissionCapabilities),
     WebSocket(WebSocketCapabilities),
     Sieve(SieveCapabilities),
+    Chat(ChatCapabilities),
     Empty(EmptyCapabilities),
     Other(serde_json::Value),
 }
@@ -130,6 +131,30 @@ pub struct SieveCapabilities {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EmptyCapabilities {}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ChatCapabilities {
+    #[serde(rename = "maxBodyBytes")]
+    pub max_body_bytes: u64,
+    #[serde(rename = "maxAttachmentBytes")]
+    pub max_attachment_bytes: u64,
+    #[serde(rename = "maxAttachmentsPerMessage")]
+    pub max_attachments_per_message: u64,
+    #[serde(rename = "maxGroupMembers")]
+    pub max_group_members: u64,
+    #[serde(rename = "maxSpaceMembers")]
+    pub max_space_members: u64,
+    #[serde(rename = "maxRolesPerSpace")]
+    pub max_roles_per_space: u64,
+    #[serde(rename = "maxChannelsPerSpace")]
+    pub max_channels_per_space: u64,
+    #[serde(rename = "maxCategoriesPerSpace")]
+    pub max_categories_per_space: u64,
+    #[serde(rename = "supportedBodyTypes")]
+    pub supported_body_types: Vec<String>,
+    #[serde(rename = "supportsThreads")]
+    pub supports_threads: bool,
+}
 
 impl Session {
     pub fn capabilities(&self) -> impl Iterator<Item = &String> {
@@ -375,5 +400,49 @@ impl<T: URLParser> URLPart<T> {
         }
 
         Ok(parts)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_chat_capabilities_deserialize() {
+        let json = r#"{
+            "maxBodyBytes": 65536,
+            "maxAttachmentBytes": 10485760,
+            "maxAttachmentsPerMessage": 10,
+            "maxGroupMembers": 100,
+            "maxSpaceMembers": 1000,
+            "maxRolesPerSpace": 20,
+            "maxChannelsPerSpace": 50,
+            "maxCategoriesPerSpace": 10,
+            "supportedBodyTypes": ["text/plain", "text/markdown"],
+            "supportsThreads": true
+        }"#;
+        let caps: ChatCapabilities = serde_json::from_str(json).unwrap();
+        assert_eq!(caps.max_body_bytes, 65536);
+        assert_eq!(caps.max_attachments_per_message, 10);
+        assert!(caps.supports_threads);
+        assert_eq!(caps.supported_body_types, ["text/plain", "text/markdown"]);
+    }
+
+    #[test]
+    fn test_capabilities_chat_variant_deserializes() {
+        let json = r#"{
+            "maxBodyBytes": 1024,
+            "maxAttachmentBytes": 1024,
+            "maxAttachmentsPerMessage": 5,
+            "maxGroupMembers": 10,
+            "maxSpaceMembers": 100,
+            "maxRolesPerSpace": 5,
+            "maxChannelsPerSpace": 10,
+            "maxCategoriesPerSpace": 5,
+            "supportedBodyTypes": ["text/plain"],
+            "supportsThreads": false
+        }"#;
+        let cap: Capabilities = serde_json::from_str(json).unwrap();
+        assert!(matches!(cap, Capabilities::Chat(_)));
     }
 }

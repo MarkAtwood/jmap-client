@@ -36,6 +36,18 @@ cp -rf source dest          # NOT: cp -r source dest
 - `apt-get` - use `-y` flag
 - `brew` - use `HOMEBREW_NO_AUTO_UPDATE=1` env var
 
+## Rust / Cargo Notes
+
+- **Feature conflicts**: `async` and `blocking` are mutually exclusive via `maybe-async`.
+  Never combine them in a single `cargo` invocation.
+- **Crypto backend**: `aws_lc_rs` and `ring` are mutually exclusive rustls backends.
+  Default is `aws_lc_rs`. Use `--no-default-features --features ring` to switch.
+- **Testing**: The test suite requires a running JMAP server for integration tests.
+  Unit tests (`cargo test --lib`) run without a server.
+- **Clippy**: Run `cargo clippy --all-features -- -D warnings` before committing.
+- **Format**: Run `cargo fmt` and commit the result if anything changes.
+- **Docs**: `RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --all-features` must be clean.
+
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
 

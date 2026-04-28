@@ -17,17 +17,12 @@ use crate::{
 
 const MAX_EVENT_SIZE: usize = 1024 * 1024;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq)]
 pub enum EventType {
     Ping,
+    #[default]
     State,
     CalendarAlert,
-}
-
-impl Default for EventType {
-    fn default() -> Self {
-        Self::State
-    }
 }
 
 #[derive(Default, Debug)]
@@ -37,18 +32,13 @@ pub struct Event {
     pub data: Vec<u8>,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone)]
 enum EventParserState {
+    #[default]
     Init,
     Comment,
     Field,
     Value,
-}
-
-impl Default for EventParserState {
-    fn default() -> Self {
-        Self::Init
-    }
 }
 
 #[derive(Default, Debug)]

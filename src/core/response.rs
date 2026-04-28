@@ -15,6 +15,10 @@ use std::fmt;
 
 use crate::{
     blob::copy::CopyBlobResponse,
+    chat::{Chat, TypingResponse},
+    chat_contact::ChatContact,
+    chat_message::Message as ChatMessage,
+    custom_emoji::CustomEmoji,
     email::{
         import::EmailImportResponse, parse::EmailParseResponse,
         search_snippet::SearchSnippetGetResponse, Email,
@@ -22,9 +26,14 @@ use crate::{
     email_submission::EmailSubmission,
     identity::Identity,
     mailbox::Mailbox,
+    presence_status::PresenceStatus,
     principal::Principal,
     push_subscription::PushSubscription,
+    read_position::ReadPosition,
     sieve::{validate::SieveScriptValidateResponse, SieveScript},
+    space::{Space, SpaceJoinResponse},
+    space_ban::SpaceBan,
+    space_invite::SpaceInvite,
     thread::Thread,
     vacation_response::VacationResponse,
     Get, Method,
@@ -138,6 +147,33 @@ pub type SieveScriptSetResponse = SetResponse<SieveScript<Get>>;
 pub type PrincipalChangesResponse = ChangesResponse<Principal<Get>>;
 pub type PrincipalSetResponse = SetResponse<Principal<Get>>;
 pub type PrincipalGetResponse = GetResponse<Principal<Get>>;
+pub type ChatContactGetResponse = GetResponse<ChatContact<Get>>;
+pub type ChatContactSetResponse = SetResponse<ChatContact<Get>>;
+pub type ChatContactChangesResponse = ChangesResponse<ChatContact<Get>>;
+pub type ChatGetResponse = GetResponse<Chat<Get>>;
+pub type ChatSetResponse = SetResponse<Chat<Get>>;
+pub type ChatChangesResponse = ChangesResponse<Chat<Get>>;
+pub type ChatMessageGetResponse = GetResponse<ChatMessage<Get>>;
+pub type ChatMessageSetResponse = SetResponse<ChatMessage<Get>>;
+pub type ChatMessageChangesResponse = ChangesResponse<ChatMessage<Get>>;
+pub type SpaceGetResponse = GetResponse<Space<Get>>;
+pub type SpaceSetResponse = SetResponse<Space<Get>>;
+pub type SpaceChangesResponse = ChangesResponse<Space<Get>>;
+pub type ReadPositionGetResponse = GetResponse<ReadPosition<Get>>;
+pub type ReadPositionSetResponse = SetResponse<ReadPosition<Get>>;
+pub type ReadPositionChangesResponse = ChangesResponse<ReadPosition<Get>>;
+pub type PresenceStatusGetResponse = GetResponse<PresenceStatus<Get>>;
+pub type PresenceStatusSetResponse = SetResponse<PresenceStatus<Get>>;
+pub type PresenceStatusChangesResponse = ChangesResponse<PresenceStatus<Get>>;
+pub type CustomEmojiGetResponse = GetResponse<CustomEmoji<Get>>;
+pub type CustomEmojiSetResponse = SetResponse<CustomEmoji<Get>>;
+pub type CustomEmojiChangesResponse = ChangesResponse<CustomEmoji<Get>>;
+pub type SpaceInviteGetResponse = GetResponse<SpaceInvite<Get>>;
+pub type SpaceInviteSetResponse = SetResponse<SpaceInvite<Get>>;
+pub type SpaceInviteChangesResponse = ChangesResponse<SpaceInvite<Get>>;
+pub type SpaceBanGetResponse = GetResponse<SpaceBan<Get>>;
+pub type SpaceBanSetResponse = SetResponse<SpaceBan<Get>>;
+pub type SpaceBanChangesResponse = ChangesResponse<SpaceBan<Get>>;
 
 #[derive(Debug)]
 pub struct TaggedMethodResponse {
@@ -189,6 +225,46 @@ pub enum MethodResponse {
 
     Echo(serde_json::Value),
     Error(MethodError),
+
+    GetChatContact(ChatContactGetResponse),
+    SetChatContact(ChatContactSetResponse),
+    ChangesChatContact(ChatContactChangesResponse),
+    QueryChatContact(QueryResponse),
+    QueryChangesChatContact(QueryChangesResponse),
+    GetChat(ChatGetResponse),
+    SetChat(ChatSetResponse),
+    ChangesChat(ChatChangesResponse),
+    QueryChat(QueryResponse),
+    QueryChangesChat(QueryChangesResponse),
+    TypingChat(TypingResponse),
+    GetChatMessage(ChatMessageGetResponse),
+    SetChatMessage(ChatMessageSetResponse),
+    ChangesChatMessage(ChatMessageChangesResponse),
+    QueryChatMessage(QueryResponse),
+    QueryChangesChatMessage(QueryChangesResponse),
+    GetSpace(SpaceGetResponse),
+    SetSpace(SpaceSetResponse),
+    ChangesSpace(SpaceChangesResponse),
+    QuerySpace(QueryResponse),
+    QueryChangesSpace(QueryChangesResponse),
+    JoinSpace(SpaceJoinResponse),
+    GetReadPosition(ReadPositionGetResponse),
+    SetReadPosition(ReadPositionSetResponse),
+    ChangesReadPosition(ReadPositionChangesResponse),
+    GetPresenceStatus(PresenceStatusGetResponse),
+    SetPresenceStatus(PresenceStatusSetResponse),
+    ChangesPresenceStatus(PresenceStatusChangesResponse),
+    GetCustomEmoji(CustomEmojiGetResponse),
+    SetCustomEmoji(CustomEmojiSetResponse),
+    ChangesCustomEmoji(CustomEmojiChangesResponse),
+    QueryCustomEmoji(QueryResponse),
+    QueryChangesCustomEmoji(QueryChangesResponse),
+    GetSpaceInvite(SpaceInviteGetResponse),
+    SetSpaceInvite(SpaceInviteSetResponse),
+    ChangesSpaceInvite(SpaceInviteChangesResponse),
+    GetSpaceBan(SpaceBanGetResponse),
+    SetSpaceBan(SpaceBanSetResponse),
+    ChangesSpaceBan(SpaceBanChangesResponse),
 }
 
 impl TaggedMethodResponse {
@@ -287,6 +363,93 @@ impl TaggedMethodResponse {
                 | (MethodResponse::SetPrincipal(_), Method::SetPrincipal)
                 | (MethodResponse::Echo(_), Method::Echo)
                 | (MethodResponse::Error(_), Method::Error)
+                | (MethodResponse::GetChatContact(_), Method::GetChatContact)
+                | (MethodResponse::SetChatContact(_), Method::SetChatContact)
+                | (
+                    MethodResponse::ChangesChatContact(_),
+                    Method::ChangesChatContact
+                )
+                | (
+                    MethodResponse::QueryChatContact(_),
+                    Method::QueryChatContact
+                )
+                | (
+                    MethodResponse::QueryChangesChatContact(_),
+                    Method::QueryChangesChatContact,
+                )
+                | (MethodResponse::GetChat(_), Method::GetChat)
+                | (MethodResponse::SetChat(_), Method::SetChat)
+                | (MethodResponse::ChangesChat(_), Method::ChangesChat)
+                | (MethodResponse::QueryChat(_), Method::QueryChat)
+                | (
+                    MethodResponse::QueryChangesChat(_),
+                    Method::QueryChangesChat
+                )
+                | (MethodResponse::TypingChat(_), Method::TypingChat)
+                | (MethodResponse::GetChatMessage(_), Method::GetChatMessage)
+                | (MethodResponse::SetChatMessage(_), Method::SetChatMessage)
+                | (
+                    MethodResponse::ChangesChatMessage(_),
+                    Method::ChangesChatMessage
+                )
+                | (
+                    MethodResponse::QueryChatMessage(_),
+                    Method::QueryChatMessage
+                )
+                | (
+                    MethodResponse::QueryChangesChatMessage(_),
+                    Method::QueryChangesChatMessage,
+                )
+                | (MethodResponse::GetSpace(_), Method::GetSpace)
+                | (MethodResponse::SetSpace(_), Method::SetSpace)
+                | (MethodResponse::ChangesSpace(_), Method::ChangesSpace)
+                | (MethodResponse::QuerySpace(_), Method::QuerySpace)
+                | (
+                    MethodResponse::QueryChangesSpace(_),
+                    Method::QueryChangesSpace
+                )
+                | (MethodResponse::JoinSpace(_), Method::JoinSpace)
+                | (MethodResponse::GetReadPosition(_), Method::GetReadPosition)
+                | (MethodResponse::SetReadPosition(_), Method::SetReadPosition)
+                | (
+                    MethodResponse::ChangesReadPosition(_),
+                    Method::ChangesReadPosition
+                )
+                | (
+                    MethodResponse::GetPresenceStatus(_),
+                    Method::GetPresenceStatus
+                )
+                | (
+                    MethodResponse::SetPresenceStatus(_),
+                    Method::SetPresenceStatus
+                )
+                | (
+                    MethodResponse::ChangesPresenceStatus(_),
+                    Method::ChangesPresenceStatus,
+                )
+                | (MethodResponse::GetCustomEmoji(_), Method::GetCustomEmoji)
+                | (MethodResponse::SetCustomEmoji(_), Method::SetCustomEmoji)
+                | (
+                    MethodResponse::ChangesCustomEmoji(_),
+                    Method::ChangesCustomEmoji
+                )
+                | (
+                    MethodResponse::QueryCustomEmoji(_),
+                    Method::QueryCustomEmoji
+                )
+                | (
+                    MethodResponse::QueryChangesCustomEmoji(_),
+                    Method::QueryChangesCustomEmoji,
+                )
+                | (MethodResponse::GetSpaceInvite(_), Method::GetSpaceInvite)
+                | (MethodResponse::SetSpaceInvite(_), Method::SetSpaceInvite)
+                | (
+                    MethodResponse::ChangesSpaceInvite(_),
+                    Method::ChangesSpaceInvite
+                )
+                | (MethodResponse::GetSpaceBan(_), Method::GetSpaceBan)
+                | (MethodResponse::SetSpaceBan(_), Method::SetSpaceBan)
+                | (MethodResponse::ChangesSpaceBan(_), Method::ChangesSpaceBan)
         )
     }
 
@@ -606,6 +769,318 @@ impl TaggedMethodResponse {
         }
     }
 
+    pub fn unwrap_get_chat_contact(self) -> crate::Result<ChatContactGetResponse> {
+        match self.response {
+            MethodResponse::GetChatContact(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_chat_contact(self) -> crate::Result<ChatContactSetResponse> {
+        match self.response {
+            MethodResponse::SetChatContact(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_chat(self) -> crate::Result<ChatGetResponse> {
+        match self.response {
+            MethodResponse::GetChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_chat(self) -> crate::Result<ChatSetResponse> {
+        match self.response {
+            MethodResponse::SetChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_typing_chat(self) -> crate::Result<TypingResponse> {
+        match self.response {
+            MethodResponse::TypingChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_chat_message(self) -> crate::Result<ChatMessageGetResponse> {
+        match self.response {
+            MethodResponse::GetChatMessage(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_chat_message(self) -> crate::Result<ChatMessageSetResponse> {
+        match self.response {
+            MethodResponse::SetChatMessage(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_space(self) -> crate::Result<SpaceGetResponse> {
+        match self.response {
+            MethodResponse::GetSpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_space(self) -> crate::Result<SpaceSetResponse> {
+        match self.response {
+            MethodResponse::SetSpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_join_space(self) -> crate::Result<SpaceJoinResponse> {
+        match self.response {
+            MethodResponse::JoinSpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_read_position(self) -> crate::Result<ReadPositionGetResponse> {
+        match self.response {
+            MethodResponse::GetReadPosition(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_read_position(self) -> crate::Result<ReadPositionSetResponse> {
+        match self.response {
+            MethodResponse::SetReadPosition(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_presence_status(self) -> crate::Result<PresenceStatusGetResponse> {
+        match self.response {
+            MethodResponse::GetPresenceStatus(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_presence_status(self) -> crate::Result<PresenceStatusSetResponse> {
+        match self.response {
+            MethodResponse::SetPresenceStatus(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_custom_emoji(self) -> crate::Result<CustomEmojiGetResponse> {
+        match self.response {
+            MethodResponse::GetCustomEmoji(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_custom_emoji(self) -> crate::Result<CustomEmojiSetResponse> {
+        match self.response {
+            MethodResponse::SetCustomEmoji(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_space_invite(self) -> crate::Result<SpaceInviteGetResponse> {
+        match self.response {
+            MethodResponse::GetSpaceInvite(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_space_invite(self) -> crate::Result<SpaceInviteSetResponse> {
+        match self.response {
+            MethodResponse::SetSpaceInvite(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_get_space_ban(self) -> crate::Result<SpaceBanGetResponse> {
+        match self.response {
+            MethodResponse::GetSpaceBan(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_set_space_ban(self) -> crate::Result<SpaceBanSetResponse> {
+        match self.response {
+            MethodResponse::SetSpaceBan(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_chat_contact(self) -> crate::Result<ChatContactChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesChatContact(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_chat_contact(self) -> crate::Result<QueryResponse> {
+        match self.response {
+            MethodResponse::QueryChatContact(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_changes_chat_contact(self) -> crate::Result<QueryChangesResponse> {
+        match self.response {
+            MethodResponse::QueryChangesChatContact(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_chat(self) -> crate::Result<ChatChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_chat(self) -> crate::Result<QueryResponse> {
+        match self.response {
+            MethodResponse::QueryChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_changes_chat(self) -> crate::Result<QueryChangesResponse> {
+        match self.response {
+            MethodResponse::QueryChangesChat(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_chat_message(self) -> crate::Result<ChatMessageChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesChatMessage(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_chat_message(self) -> crate::Result<QueryResponse> {
+        match self.response {
+            MethodResponse::QueryChatMessage(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_changes_chat_message(self) -> crate::Result<QueryChangesResponse> {
+        match self.response {
+            MethodResponse::QueryChangesChatMessage(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_space(self) -> crate::Result<SpaceChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesSpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_space(self) -> crate::Result<QueryResponse> {
+        match self.response {
+            MethodResponse::QuerySpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_changes_space(self) -> crate::Result<QueryChangesResponse> {
+        match self.response {
+            MethodResponse::QueryChangesSpace(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_read_position(self) -> crate::Result<ReadPositionChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesReadPosition(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_presence_status(self) -> crate::Result<PresenceStatusChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesPresenceStatus(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_custom_emoji(self) -> crate::Result<CustomEmojiChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesCustomEmoji(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_custom_emoji(self) -> crate::Result<QueryResponse> {
+        match self.response {
+            MethodResponse::QueryCustomEmoji(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_query_changes_custom_emoji(self) -> crate::Result<QueryChangesResponse> {
+        match self.response {
+            MethodResponse::QueryChangesCustomEmoji(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_space_invite(self) -> crate::Result<SpaceInviteChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesSpaceInvite(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
+    pub fn unwrap_changes_space_ban(self) -> crate::Result<SpaceBanChangesResponse> {
+        match self.response {
+            MethodResponse::ChangesSpaceBan(response) => Ok(response),
+            MethodResponse::Error(err) => Err(err.into()),
+            _ => Err(crate::Error::Internal("Invalid response type".to_string())),
+        }
+    }
+
     pub fn is_error(&self) -> bool {
         matches!(self.response, MethodResponse::Error(_))
     }
@@ -794,6 +1269,162 @@ impl<'de> Visitor<'de> for TaggedMethodResponseVisitor {
                     .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
             ),
             Method::Error => MethodResponse::Error(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetChatContact => MethodResponse::GetChatContact(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetChatContact => MethodResponse::SetChatContact(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesChatContact => MethodResponse::ChangesChatContact(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChatContact => MethodResponse::QueryChatContact(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChangesChatContact => MethodResponse::QueryChangesChatContact(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetChat => MethodResponse::GetChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetChat => MethodResponse::SetChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesChat => MethodResponse::ChangesChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChat => MethodResponse::QueryChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChangesChat => MethodResponse::QueryChangesChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::TypingChat => MethodResponse::TypingChat(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetChatMessage => MethodResponse::GetChatMessage(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetChatMessage => MethodResponse::SetChatMessage(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesChatMessage => MethodResponse::ChangesChatMessage(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChatMessage => MethodResponse::QueryChatMessage(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChangesChatMessage => MethodResponse::QueryChangesChatMessage(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetSpace => MethodResponse::GetSpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetSpace => MethodResponse::SetSpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesSpace => MethodResponse::ChangesSpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QuerySpace => MethodResponse::QuerySpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChangesSpace => MethodResponse::QueryChangesSpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::JoinSpace => MethodResponse::JoinSpace(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetReadPosition => MethodResponse::GetReadPosition(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetReadPosition => MethodResponse::SetReadPosition(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesReadPosition => MethodResponse::ChangesReadPosition(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetPresenceStatus => MethodResponse::GetPresenceStatus(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetPresenceStatus => MethodResponse::SetPresenceStatus(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesPresenceStatus => MethodResponse::ChangesPresenceStatus(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetCustomEmoji => MethodResponse::GetCustomEmoji(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetCustomEmoji => MethodResponse::SetCustomEmoji(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesCustomEmoji => MethodResponse::ChangesCustomEmoji(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryCustomEmoji => MethodResponse::QueryCustomEmoji(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::QueryChangesCustomEmoji => MethodResponse::QueryChangesCustomEmoji(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetSpaceInvite => MethodResponse::GetSpaceInvite(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetSpaceInvite => MethodResponse::SetSpaceInvite(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesSpaceInvite => MethodResponse::ChangesSpaceInvite(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::GetSpaceBan => MethodResponse::GetSpaceBan(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::SetSpaceBan => MethodResponse::SetSpaceBan(
+                seq.next_element()?
+                    .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
+            ),
+            Method::ChangesSpaceBan => MethodResponse::ChangesSpaceBan(
                 seq.next_element()?
                     .ok_or_else(|| serde::de::Error::custom("Expected a method response"))?,
             ),

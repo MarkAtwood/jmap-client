@@ -182,17 +182,28 @@
 
 #[forbid(unsafe_code)]
 pub mod blob;
+pub mod chat;
+pub mod chat_contact;
+pub mod chat_message;
+pub mod chat_types;
+pub mod chat_validation;
 pub mod client;
 pub mod core;
+pub mod custom_emoji;
 pub mod email;
 pub mod email_submission;
 #[cfg(feature = "async")]
 pub mod event_source;
 pub mod identity;
 pub mod mailbox;
+pub mod presence_status;
 pub mod principal;
 pub mod push_subscription;
+pub mod read_position;
 pub mod sieve;
+pub mod space;
+pub mod space_ban;
+pub mod space_invite;
 pub mod thread;
 pub mod vacation_response;
 
@@ -228,6 +239,8 @@ pub enum URI {
     Principals,
     #[serde(rename = "urn:ietf:params:jmap:principals:owner")]
     PrincipalsOwner,
+    #[serde(rename = "urn:ietf:params:jmap:chat")]
+    Chat,
 }
 
 impl AsRef<str> for URI {
@@ -243,6 +256,7 @@ impl AsRef<str> for URI {
             URI::Sieve => "urn:ietf:params:jmap:sieve",
             URI::Principals => "urn:ietf:params:jmap:principals",
             URI::PrincipalsOwner => "urn:ietf:params:jmap:principals:owner",
+            URI::Chat => "urn:ietf:params:jmap:chat",
         }
     }
 }
@@ -327,6 +341,93 @@ pub enum Method {
     QueryChangesPrincipal,
     #[serde(rename = "Principal/set")]
     SetPrincipal,
+    // ChatContact methods
+    #[serde(rename = "ChatContact/get")]
+    GetChatContact,
+    #[serde(rename = "ChatContact/changes")]
+    ChangesChatContact,
+    #[serde(rename = "ChatContact/set")]
+    SetChatContact,
+    #[serde(rename = "ChatContact/query")]
+    QueryChatContact,
+    #[serde(rename = "ChatContact/queryChanges")]
+    QueryChangesChatContact,
+    // Chat methods
+    #[serde(rename = "Chat/get")]
+    GetChat,
+    #[serde(rename = "Chat/changes")]
+    ChangesChat,
+    #[serde(rename = "Chat/set")]
+    SetChat,
+    #[serde(rename = "Chat/query")]
+    QueryChat,
+    #[serde(rename = "Chat/queryChanges")]
+    QueryChangesChat,
+    #[serde(rename = "Chat/typing")]
+    TypingChat,
+    // Message methods
+    #[serde(rename = "Message/get")]
+    GetChatMessage,
+    #[serde(rename = "Message/changes")]
+    ChangesChatMessage,
+    #[serde(rename = "Message/set")]
+    SetChatMessage,
+    #[serde(rename = "Message/query")]
+    QueryChatMessage,
+    #[serde(rename = "Message/queryChanges")]
+    QueryChangesChatMessage,
+    // Space methods
+    #[serde(rename = "Space/get")]
+    GetSpace,
+    #[serde(rename = "Space/changes")]
+    ChangesSpace,
+    #[serde(rename = "Space/set")]
+    SetSpace,
+    #[serde(rename = "Space/query")]
+    QuerySpace,
+    #[serde(rename = "Space/queryChanges")]
+    QueryChangesSpace,
+    #[serde(rename = "Space/join")]
+    JoinSpace,
+    // ReadPosition methods
+    #[serde(rename = "ReadPosition/get")]
+    GetReadPosition,
+    #[serde(rename = "ReadPosition/changes")]
+    ChangesReadPosition,
+    #[serde(rename = "ReadPosition/set")]
+    SetReadPosition,
+    // PresenceStatus methods
+    #[serde(rename = "PresenceStatus/get")]
+    GetPresenceStatus,
+    #[serde(rename = "PresenceStatus/changes")]
+    ChangesPresenceStatus,
+    #[serde(rename = "PresenceStatus/set")]
+    SetPresenceStatus,
+    // CustomEmoji methods
+    #[serde(rename = "CustomEmoji/get")]
+    GetCustomEmoji,
+    #[serde(rename = "CustomEmoji/changes")]
+    ChangesCustomEmoji,
+    #[serde(rename = "CustomEmoji/set")]
+    SetCustomEmoji,
+    #[serde(rename = "CustomEmoji/query")]
+    QueryCustomEmoji,
+    #[serde(rename = "CustomEmoji/queryChanges")]
+    QueryChangesCustomEmoji,
+    // SpaceInvite methods
+    #[serde(rename = "SpaceInvite/get")]
+    GetSpaceInvite,
+    #[serde(rename = "SpaceInvite/changes")]
+    ChangesSpaceInvite,
+    #[serde(rename = "SpaceInvite/set")]
+    SetSpaceInvite,
+    // SpaceBan methods
+    #[serde(rename = "SpaceBan/get")]
+    GetSpaceBan,
+    #[serde(rename = "SpaceBan/changes")]
+    ChangesSpaceBan,
+    #[serde(rename = "SpaceBan/set")]
+    SetSpaceBan,
     #[serde(rename = "error")]
     Error,
 }
@@ -379,6 +480,27 @@ pub enum DataType {
     ParticipantIdentity = 21,
     #[serde(rename = "CalendarAlert")]
     CalendarAlert = 22,
+    // JMAP Chat data types (draft-atwood-jmap-chat)
+    #[serde(rename = "ChatContact")]
+    ChatContact = 23,
+    #[serde(rename = "Chat")]
+    ChatRoom = 24,
+    // Wire name is "Message" per IANA registration; Rust name is ChatMessage
+    // to avoid collision with JMAP Mail's email/message concept.
+    #[serde(rename = "Message")]
+    ChatMessage = 25,
+    #[serde(rename = "Space")]
+    Space = 26,
+    #[serde(rename = "SpaceInvite")]
+    SpaceInvite = 27,
+    #[serde(rename = "CustomEmoji")]
+    CustomEmoji = 28,
+    #[serde(rename = "SpaceBan")]
+    SpaceBan = 29,
+    #[serde(rename = "ReadPosition")]
+    ReadPosition = 30,
+    #[serde(rename = "PresenceStatus")]
+    PresenceStatus = 31,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -518,6 +640,15 @@ impl Display for DataType {
             DataType::Principal => write!(f, "Principal"),
             DataType::ShareNotification => write!(f, "ShareNotification"),
             DataType::ParticipantIdentity => write!(f, "ParticipantIdentity"),
+            DataType::ChatContact => write!(f, "ChatContact"),
+            DataType::ChatRoom => write!(f, "Chat"),
+            DataType::ChatMessage => write!(f, "Message"),
+            DataType::Space => write!(f, "Space"),
+            DataType::SpaceInvite => write!(f, "SpaceInvite"),
+            DataType::CustomEmoji => write!(f, "CustomEmoji"),
+            DataType::SpaceBan => write!(f, "SpaceBan"),
+            DataType::ReadPosition => write!(f, "ReadPosition"),
+            DataType::PresenceStatus => write!(f, "PresenceStatus"),
         }
     }
 }
