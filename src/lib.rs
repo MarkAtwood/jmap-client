@@ -480,11 +480,13 @@ pub enum DataType {
     ParticipantIdentity = 21,
     #[serde(rename = "CalendarAlert")]
     CalendarAlert = 22,
-    // JMAP Chat data types (draft-atwood-jmap-chat)
+    // JMAP Chat data types (draft-atwood-jmap-chat) — discriminants 23–31 reserved for chat.
     #[serde(rename = "ChatContact")]
     ChatContact = 23,
+    // Wire name is "Chat"; Rust name avoids collision with the chat module's Chat struct
+    // via the fully-qualified path DataType::Chat.
     #[serde(rename = "Chat")]
-    ChatRoom = 24,
+    Chat = 24,
     // Wire name is "Message" per IANA registration; Rust name is ChatMessage
     // to avoid collision with JMAP Mail's email/message concept.
     #[serde(rename = "Message")]
@@ -641,7 +643,7 @@ impl Display for DataType {
             DataType::ShareNotification => write!(f, "ShareNotification"),
             DataType::ParticipantIdentity => write!(f, "ParticipantIdentity"),
             DataType::ChatContact => write!(f, "ChatContact"),
-            DataType::ChatRoom => write!(f, "Chat"),
+            DataType::Chat => write!(f, "Chat"),
             DataType::ChatMessage => write!(f, "Message"),
             DataType::Space => write!(f, "Space"),
             DataType::SpaceInvite => write!(f, "SpaceInvite"),

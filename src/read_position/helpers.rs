@@ -14,9 +14,9 @@ use super::ReadPosition;
 
 impl Client {
     #[maybe_async::maybe_async]
-    pub async fn read_position_get(&self, chat_id: &str) -> crate::Result<Option<ReadPosition>> {
+    pub async fn read_position_get(&self, id: &str) -> crate::Result<Option<ReadPosition>> {
         let mut request = self.build();
-        request.get_read_position().ids([chat_id]);
+        request.get_read_position().ids([id]);
         request
             .send_single::<ReadPositionGetResponse>()
             .await

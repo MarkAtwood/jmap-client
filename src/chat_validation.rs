@@ -36,11 +36,17 @@ impl fmt::Display for ValidationError {
                 offset,
                 length,
                 body_len,
-            } => write!(
-                f,
-                "mention out of bounds: offset {} + length {} > body {} bytes",
-                offset, length, body_len
-            ),
+            } => {
+                if *length == 0 {
+                    write!(f, "mention has zero length at offset {}", offset)
+                } else {
+                    write!(
+                        f,
+                        "mention out of bounds: offset {} + length {} > body {} bytes",
+                        offset, length, body_len
+                    )
+                }
+            }
             ValidationError::InvalidSha256Hex(msg) => write!(f, "invalid sha256 hex: {}", msg),
             ValidationError::BodyTooLarge { actual, max } => {
                 write!(f, "body too large: {} bytes, max {} bytes", actual, max)
@@ -94,8 +100,8 @@ pub fn validate_content_type(s: &str) -> Result<(), ValidationError> {
             "media subtype is empty".to_string(),
         ));
     }
-    // Neither part may contain another '/'
-    if type_part.contains('/') || subtype_part.contains('/') {
+    // subtype_part must not contain a nested '/' (e.g. "text//plain" gives subtype "/plain")
+    if subtype_part.contains('/') {
         return Err(ValidationError::InvalidContentType(
             "extra '/' in content-type".to_string(),
         ));

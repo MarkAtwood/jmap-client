@@ -109,6 +109,12 @@ impl Request<'_> {
         self.send_single().await
     }
 
+    /// Returns a `SetRequest` for SpaceInvite.
+    ///
+    /// **Warning**: per the spec, `update` on SpaceInvite MUST return a `forbidden` error from
+    /// the server. Only `create` (to issue a new invite) and `destroy` (to revoke) are valid.
+    /// Calling `.update()` or `.update_item()` on the returned request will compile but will
+    /// produce a server-side error.
     pub fn set_space_invite(&mut self) -> &mut SetRequest<SpaceInvite<Set>> {
         self.add_capability(URI::Chat);
         self.add_method_call(
